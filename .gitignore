@@ -1,0 +1,10 @@
+build/
+*.rbxl
+*.rbxlx
+*.lock
+node_modules/
+
+# Private: separate repo (Mohidkz05/class-of-87-notes)
+notes/
+/CLAUDE.md
+/level.json

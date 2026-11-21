@@ -1,0 +1,19 @@
+{
+  "name": "Class of 87",
+  "tree": {
+    "$className": "DataModel",
+    "ReplicatedStorage": { "Shared": { "$path": "src/shared" } },
+    "ServerScriptService": { "Game": { "$path": "src/server" } },
+    "StarterPlayer": {
+      "$properties": {
+        "CameraMode": "LockFirstPerson",
+        "CharacterWalkSpeed": 10,
+        "CharacterJumpPower": 0,
+        "CharacterUseJumpPower": true
+      },
+      "StarterPlayerScripts": { "Client": { "$path": "src/client" } }
+    },
+    "Players": { "$properties": { "CharacterAutoLoads": false } },
+    "Lighting": { "$properties": { "Technology": "Future" } }
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "name": "class-of-87-art",
+  "private": true,
+  "type": "module",
+  "scripts": { "build": "node generate.mjs" },
+  "dependencies": {
+    "@fontsource/bangers": "5.2.5",
+    "@fontsource/permanent-marker": "5.2.5",
+    "@fontsource/special-elite": "5.2.5",
+    "@resvg/resvg-js": "2.6.2",
+    "satori": "0.63.2"
+  }
+}

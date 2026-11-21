@@ -1,0 +1,49 @@
+<!doctype html><html><head><meta charset="utf-8"><title>School preview</title>
+<style>html,body{margin:0;background:#000}canvas{display:block}.l{position:absolute;color:#ebe1cd;font:14px monospace;background:#000a;padding:2px 6px}</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script></head><body><script>
+(async()=>{
+const data=await (await fetch('level.json')).json();
+const W=1600,H=900,COLS=4;const DIR=new URLSearchParams(location.search).get('d')==='s'?-1:1;
+const R=new THREE.WebGLRenderer({antialias:true,preserveDrawingBuffer:true});R.setSize(W,H);R.setScissorTest(true);document.body.appendChild(R.domElement);
+const scene=new THREE.Scene();scene.background=new THREE.Color(0x05060a);scene.fog=new THREE.Fog(0x05060a,40,130);
+scene.add(new THREE.AmbientLight(0x8a93a5,0.62));
+const rooms={};
+const faces={Back:[0,0,1,0],Front:[0,0,-1,Math.PI],Left:[-1,0,0,-Math.PI/2],Right:[1,0,0,Math.PI/2]};
+for(const b of data){
+ const [sx,sy,sz]=b.s;let g;
+ if(b.shape==='Cylinder'){const d=Math.min(sy,sz);g=new THREE.CylinderGeometry(d/2,d/2,sx,20);g.rotateZ(Math.PI/2);}
+ else if(b.shape==='Ball'){g=new THREE.SphereGeometry(Math.min(sx,sy,sz)/2,18,14);}
+ else g=new THREE.BoxGeometry(sx,sy,sz);
+ const col=new THREE.Color(b.c[0]/255,b.c[1]/255,b.c[2]/255);
+ const neon=b.m==='Neon';
+ const mat=neon?new THREE.MeshBasicMaterial({color:col}):new THREE.MeshLambertMaterial({color:col});
+ if(b.alpha>0){mat.transparent=true;mat.opacity=1-b.alpha}
+ const m=new THREE.Mesh(g,mat);
+ m.position.set(b.ox+b.p[0],b.p[1],b.oz+b.p[2]);m.rotation.set(b.rot[0]*Math.PI/180,b.rot[1]*Math.PI/180,b.rot[2]*Math.PI/180,'XYZ');scene.add(m);
+ rooms[b.r]=rooms[b.r]||{ox:b.ox,oz:b.oz};
+ if(b.light>0){const l=new THREE.PointLight(col,1.1,b.light*1.5,1.2);l.position.copy(m.position);scene.add(l)}
+ if(b.text&&faces[b.face]){
+  const f=faces[b.face];const w=b.face==='Left'||b.face==='Right'?sz:sx;
+  const c=document.createElement('canvas');c.width=Math.ceil(w*40);c.height=Math.ceil(sy*40);const x=c.getContext('2d');
+  const lines=b.text.split('|');let fs=Math.min(c.height*.84/lines.length,c.width/(Math.max(...lines.map(s=>s.length))*.62));
+  x.font=`bold ${fs}px Impact, sans-serif`;x.textAlign='center';x.textBaseline='middle';
+  const bright=(b.c[0]+b.c[1]+b.c[2])/3;x.fillStyle=bright>110?'#181612':'#e8e4d4';
+  lines.forEach((s,i)=>x.fillText(s,c.width/2,c.height*(i+.5)/lines.length));
+  const t=new THREE.CanvasTexture(c);const p=new THREE.Mesh(new THREE.PlaneGeometry(w,sy),new THREE.MeshBasicMaterial({map:t,transparent:true}));
+  const d=(f[0]?sx:sz)/2+.03;p.position.set(f[0]*d,0,f[2]*d);p.rotation.y=f[3]===Math.PI?Math.PI:(f[0]===-1?-Math.PI/2:(f[0]===1?Math.PI/2:0));m.add(p);
+ }
+}
+const names=Object.keys(rooms);
+// Every room gets a low-level sweep light so the preview is readable; the game is darker.
+for(const n of names){const r=rooms[n];const l=new THREE.PointLight(0xdfe8d0,.5,60,1.2);l.position.set(r.ox,13,r.oz);scene.add(l)}
+const vw=W/COLS,vh=H/Math.ceil(names.length/COLS);
+names.forEach((n,i)=>{const r=rooms[n];
+ const cx=(i%COLS)*vw,cy=H-(Math.floor(i/COLS)+1)*vh;
+ R.setViewport(cx,cy,vw-2,vh-2);R.setScissor(cx,cy,vw-2,vh-2);
+ const cam=new THREE.PerspectiveCamera(72,vw/vh,.1,200);
+ cam.position.set(r.ox-1,5,r.oz+15*DIR);cam.lookAt(r.ox+1,4.5,r.oz-20*DIR);R.render(scene,cam);
+ const d=document.createElement('div');d.className='l';d.textContent=n;d.style.left=cx+6+'px';d.style.top=(H-cy-vh+6)+'px';document.body.appendChild(d);
+});
+window.READY=true;
+})();
+</script></body></html>
