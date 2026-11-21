@@ -145,9 +145,11 @@ local function wordsIn(text)
 	end
 	return n
 end
-for _, key in { "DISCLAIMER", "GOAL", "AWAKE", "GATE", "CAUGHT", "ESCAPED", "ESCAPED_HOOK", "CHASE", "DESKS", "MIRROR" } do
+for _, key in { "DISCLAIMER", "GOAL", "AWAKE", "GATE", "CAUGHT", "ESCAPED", "ESCAPED_HOOK", "CHASE", "DESKS", "MIRROR", "NEXT_HINT" } do
 	assert(wordsIn(Story[key]) <= 5, "story too wordy: " .. key)
 end
+-- A username is one word, so "WATCHING NAME" stays at 2
+assert(wordsIn(Story.WATCHING) == 1, "WATCHING must be one word")
 for _, group in { Story.INTRO, Story.FUSE, Story.CHALK } do
 	for _, line in group do
 		assert(wordsIn(line) <= 5, "story too wordy: " .. line)

@@ -12,6 +12,9 @@ return {
 	ESCAPED = "YOU GOT OUT.",
 	ESCAPED_HOOK = "31 STILL INSIDE.",
 	CHASE = "RUN!",
+	-- Caught in co-op: watching a teammate. The player's username follows WATCHING.
+	WATCHING = "WATCHING",
+	NEXT_HINT = "CLICK OR TAP: NEXT",
 	-- Staged scares
 	DESKS = "SIT DOWN",
 	MIRROR = "LOOK BEHIND",

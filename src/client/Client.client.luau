@@ -316,7 +316,96 @@ showDisclaimer()
 showFinale()
 
 local LUNGE_SECONDS = 0.35
+
+-- Caught in co-op: after the cut to black, watch a teammate who's still alive,
+-- from just behind their shoulder. Click or tap to switch. Solo, it stays dark.
+local SPECTATE_AFTER = 1.8
+local spectating = nil -- the player being watched
+local watchLabel = label(UDim2.fromScale(0.5, 0.8), UDim2.new(0.8, 0, 0, 34), 28, Enum.Font.Bangers)
+local hintLabel = label(UDim2.fromScale(0.5, 0.85), UDim2.new(0.8, 0, 0, 22), 16, Enum.Font.SpecialElite)
+local spectateRay = RaycastParams.new()
+spectateRay.FilterType = Enum.RaycastFilterType.Exclude
+
+local function livingTeammates()
+	local list = {}
+	for _, other in Players:GetPlayers() do
+		local character = other ~= player and other.Character
+		local humanoid = character and character:FindFirstChildOfClass("Humanoid")
+		if humanoid and humanoid.Health > 0 and character:FindFirstChild("HumanoidRootPart") then
+			table.insert(list, other)
+		end
+	end
+	return list
+end
+
+-- Moves to the next living teammate, or keeps the current one when step is 0.
+local function watch(step)
+	local list = livingTeammates()
+	if #list == 0 then
+		spectating = nil
+		watchLabel.Text = ""
+		hintLabel.Text = ""
+		blackout.BackgroundTransparency = 0 -- nobody left to watch: dark until the next run
+		return
+	end
+	local at = table.find(list, spectating)
+	spectating = if at then list[(at - 1 + step) % #list + 1] else list[1]
+	watchLabel.Text = Story.WATCHING .. " " .. string.upper(spectating.Name)
+	hintLabel.Text = if #list > 1 then Story.NEXT_HINT else ""
+end
+
+local function startSpectating()
+	watch(0)
+	if not spectating then
+		return
+	end
+	catchStart = nil
+	showFigure(false)
+	track.Visible = false
+	camera.CameraType = Enum.CameraType.Scriptable
+	TweenService:Create(blackout, TweenInfo.new(0.6), { BackgroundTransparency = 1 }):Play()
+	ContextActionService:BindAction("NextTeammate", function(_, state)
+		if state == Enum.UserInputState.Begin then
+			watch(1)
+		end
+		return Enum.ContextActionResult.Sink
+	end, true, Enum.UserInputType.MouseButton1, Enum.KeyCode.ButtonR1)
+	ContextActionService:SetTitle("NextTeammate", "Next")
+end
+
+local function stopSpectating()
+	spectating = nil
+	ContextActionService:UnbindAction("NextTeammate")
+	camera.CameraType = Enum.CameraType.Custom
+	watchLabel.Text = ""
+	hintLabel.Text = ""
+	track.Visible = true
+end
+
+-- Third-person follow camera that pulls in rather than clipping through walls.
+local function followTeammate(dt)
+	local character = spectating.Character
+	local root = character and character:FindFirstChild("HumanoidRootPart")
+	local humanoid = character and character:FindFirstChildOfClass("Humanoid")
+	if not root or not humanoid or humanoid.Health <= 0 then
+		watch(1) -- they were caught too: move on to someone else
+		return
+	end
+	local ignore = { figure, lightPart, dustPart, character }
+	if player.Character then
+		table.insert(ignore, player.Character)
+	end
+	spectateRay.FilterDescendantsInstances = ignore
+	local focus = root.Position + Vector3.new(0, 2.5, 0)
+	local back = -root.CFrame.LookVector * 9 + Vector3.new(0, 3.5, 0)
+	local hit = workspace:Raycast(focus, back, spectateRay)
+	local distance = if hit then math.max(1, (hit.Position - focus).Magnitude - 0.8) else back.Magnitude
+	local goal = CFrame.lookAt(focus + back.Unit * distance, focus)
+	camera.CFrame = camera.CFrame:Lerp(goal, math.min(1, dt * 8))
+end
+
 local function onCharacter(character)
+	stopSpectating()
 	blackout.BackgroundTransparency = 1
 	catchStart = nil
 	figureShown = false
@@ -328,6 +417,11 @@ local function onCharacter(character)
 		showFigure(true)
 		task.delay(LUNGE_SECONDS + 0.1, function()
 			TweenService:Create(blackout, TweenInfo.new(0.2), { BackgroundTransparency = 0 }):Play()
+		end)
+		task.delay(SPECTATE_AFTER, function()
+			if player.Character == character then
+				startSpectating()
+			end
 		end)
 	end)
 end
@@ -435,6 +529,10 @@ RunService.RenderStepped:Connect(function(dt)
 	if sinceCue >= CUE_INTERVAL then
 		sinceCue = 0
 		updateCues()
+	end
+
+	if spectating then
+		followTeammate(dt)
 	end
 
 	if catchStart then

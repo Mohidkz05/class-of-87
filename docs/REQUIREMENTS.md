@@ -37,6 +37,7 @@ the HUD still need a real playtest.
 | G9 | Runs last about 5 to 8 minutes | Unverified; check in playtest |
 | G10 | Players can slam doors to hold the threat for 5 seconds, then wait 9 seconds to reuse them | Built |
 | G11 | Props never block a doorway or route | Tested |
+| G12 | A caught player watches a living teammate from behind, and can click or tap to switch. Solo, or once nobody's left, the screen stays dark until the restart | Built |
 
 ## Story and pacing
 | ID | Requirement | Status |
