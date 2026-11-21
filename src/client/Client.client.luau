@@ -316,7 +316,7 @@ showDisclaimer()
 showFinale()
 
 local LUNGE_SECONDS = 0.35
-player.CharacterAdded:Connect(function(character)
+local function onCharacter(character)
 	blackout.BackgroundTransparency = 1
 	catchStart = nil
 	figureShown = false
@@ -330,7 +330,11 @@ player.CharacterAdded:Connect(function(character)
 			TweenService:Create(blackout, TweenInfo.new(0.2), { BackgroundTransparency = 0 }):Play()
 		end)
 	end)
-end)
+end
+player.CharacterAdded:Connect(onCharacter)
+if player.Character then -- the server may spawn us before this script starts
+	task.spawn(onCharacter, player.Character)
+end
 
 -- "RUN!" slams on screen when a chase begins near you, at most once every 8 seconds.
 local lastRunCue = -100

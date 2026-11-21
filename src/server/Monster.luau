@@ -184,7 +184,12 @@ function Monster:catchNearby()
 		if root and humanoid and humanoid.Health > 0 then
 			local flat = Vector3.new(root.Position.X, 0, root.Position.Z)
 			if (flat - here).Magnitude <= Config.CATCH_DISTANCE then
-				self.onCatch(player, humanoid)
+				-- Never through a wall or a shut door
+				local from = self.position + Vector3.new(0, 5, 0)
+				local hit = workspace:Raycast(from, root.Position - from, self.sightParams)
+				if not hit or hit.Instance:IsDescendantOf(character) then
+					self.onCatch(player, humanoid)
+				end
 			end
 		end
 	end

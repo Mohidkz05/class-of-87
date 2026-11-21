@@ -1,6 +1,6 @@
 # Class of '87: Requirements
 
-Last updated: 2026-11-02
+Last updated: 2026-11-21
 
 Status key:
 - **Built:** code exists, but nobody has played it in Studio yet
@@ -66,7 +66,7 @@ the HUD still need a real playtest.
 | M3 | Can hear running from 70 studs, walking from 14, and fuse pickups from 45; standing still is silent | Tested (running and walking); Built (fuse) |
 | M4 | Sight is limited to 32 studs and blocked by walls and props | Built |
 | M5 | Its speed sits between walking and running, so running escapes it but makes noise | Built |
-| M6 | Never visible: no model, face or silhouette | Built |
+| M6 | Mostly unseen: the only visible form is the brief headless figure in C7, never a face | Built |
 | M7 | Uneven heavy footsteps show where it is | Tested (uneven timing); Built (sound) |
 | M8 | Dark footprints appear along its path and fade | Built |
 | M9 | When it's near, flashlight and lamps flicker, ambience drops out, dust falls, the screen dims | Tested (intensity rule); Built (effects) |

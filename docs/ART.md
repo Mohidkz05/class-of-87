@@ -1,6 +1,6 @@
 # Class of '87: Art Plan
 
-Last updated: 2026-11-02
+Last updated: 2026-11-21
 
 The goal is to spend no money on art.
 
@@ -48,7 +48,7 @@ Cold moonlight, sickly fluorescent light and old institutional colors: checker f
 paint, red and teal lockers, exposed brick and rust. Red marks danger and the exit. Titles use
 Permanent Marker, like chalk, with Special Elite for small typed lines.
 
-**No figures, ever.** Trophies are cups only, "GO EAGLES" is text with no bird, and the chemistry
+**No figures apart from the headless threat** (requirement C7). Trophies are cups only, "GO EAGLES" is text with no bird, and the chemistry
 lab has no skeleton. Threats are shown by footprints, damage and darkness.
 
 Fonts come through Fontsource. Check each license before publishing.

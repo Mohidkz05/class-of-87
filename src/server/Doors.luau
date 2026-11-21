@@ -71,6 +71,7 @@ function Doors:slamDoor(door, seconds, cooldown)
 	door.readyAt = now + seconds + cooldown
 	door.prompt.Enabled = false
 	door.leaf.CanCollide = true
+	door.leaf.CanQuery = true -- a shut door blocks its sight, and hides the figure
 	door.slam:Play()
 	TweenService:Create(door.leaf, TweenInfo.new(0.12, Enum.EasingStyle.Quad, Enum.EasingDirection.In), { CFrame = door.closed }):Play()
 	task.delay(seconds, function()
@@ -79,6 +80,7 @@ function Doors:slamDoor(door, seconds, cooldown)
 		end
 		door.shut = false
 		door.leaf.CanCollide = false
+		door.leaf.CanQuery = false
 		TweenService:Create(door.leaf, TweenInfo.new(0.35, Enum.EasingStyle.Back), { CFrame = door.open }):Play()
 		task.delay(cooldown, function()
 			if door.prompt.Parent then

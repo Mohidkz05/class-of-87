@@ -28,11 +28,12 @@ function SetPieces.circle(roll: () -> number): { Step }
 	local steps: { Step } = {}
 	local count = 7
 	local angle = roll() * 360
-	local previous = nil
+	local previous: number? = nil
 	for i = 1, count do
 		angle += 50 + roll() * 70
-		previous = uneven(0.35, 0.95, previous, roll)
-		table.insert(steps, { angle = angle, radius = 20 - 15 * (i - 1) / (count - 1), wait = previous })
+		local gap = uneven(0.35, 0.95, previous, roll)
+		previous = gap
+		table.insert(steps, { angle = angle, radius = 20 - 15 * (i - 1) / (count - 1), wait = gap })
 	end
 	return steps
 end
@@ -40,10 +41,11 @@ end
 -- Gaps for bangs that race along a row of doors.
 function SetPieces.wave(count: number, low: number, high: number, roll: () -> number): { number }
 	local gaps: { number } = {}
-	local previous = nil
+	local previous: number? = nil
 	for _ = 1, count do
-		previous = uneven(low, high, previous, roll)
-		table.insert(gaps, previous)
+		local gap = uneven(low, high, previous, roll)
+		previous = gap
+		table.insert(gaps, gap)
 	end
 	return gaps
 end

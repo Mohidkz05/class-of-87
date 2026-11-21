@@ -139,7 +139,7 @@ end
 startRun = function()
 	local rooms = LevelGen.generate(os.time(), Config.MIDDLE_ROOMS, Config.FUSES_NEEDED)
 	local folder, fuses, panel, assets = World.build(rooms)
-	local thisRun = { rooms = rooms, folder = folder, ended = false, found = 0 }
+	local thisRun: any = { rooms = rooms, folder = folder, ended = false, found = 0 }
 	run = thisRun
 
 	thisRun.checkAllDead = function()
@@ -220,7 +220,16 @@ startRun = function()
 	end)
 end
 
-Players.PlayerAdded:Connect(spawnPlayer)
+-- The first player to arrive starts the school, so nobody misses the intro or the grace period.
+local started = false
+Players.PlayerAdded:Connect(function(player)
+	if started then
+		spawnPlayer(player)
+	else
+		started = true
+		startRun() -- spawns everyone already here
+	end
+end)
 Players.PlayerRemoving:Connect(function()
 	task.defer(function()
 		if run and #Players:GetPlayers() > 0 then
@@ -255,4 +264,7 @@ RunService.Heartbeat:Connect(function(dt)
 	end
 end)
 
-startRun()
+if not started and #Players:GetPlayers() > 0 then -- someone joined before this script ran
+	started = true
+	startRun()
+end
